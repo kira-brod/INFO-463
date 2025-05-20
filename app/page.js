@@ -1,103 +1,132 @@
-import Image from "next/image";
+'use client'
+import { useState } from 'react';
 
-export default function Home() {
+export default function AlphabetCircle() {
+  const radius = 181;
+  const letterRadius = 21;
+  
+  const [typedWord, setTypedWord] = useState('');
+  const [recentLetter, setRecentLetter] = useState(null);
+  const [isUppercase, setIsUppercase] = useState(true);
+  
+  const generateAlphabet = () => {
+    const startCharCode = isUppercase ? 65 : 97; // ASCII for 'A' or 'a'
+    return Array.from({ length: 26 }, (_, i) => String.fromCharCode(startCharCode + i));
+  };
+  
+  const alphabet = generateAlphabet();
+  
+  const calculatePosition = (index, totalItems) => {
+    const angle = (index * 2 * Math.PI) / totalItems - Math.PI / 2; 
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    return { x, y, angle };
+  };
+  
+  const handleLetterClick = (letter) => {
+    setTypedWord(prev => prev + letter);
+    setRecentLetter(letter);
+    
+    setTimeout(() => {
+      if (recentLetter === letter) {
+        setRecentLetter(null);
+      }
+    }, 500);
+  };
+  
+  const handleBackspace = () => {
+    setTypedWord(prev => prev.slice(0, -1));
+  };
+  
+  const handleClear = () => {
+    setTypedWord('');
+  };
+  
+  const toggleCase = () => {
+    setIsUppercase(prev => !prev);
+  };
+  
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex flex-col items-center p-8 rounded-lg">
+      <h2 className="text-2xl font-bold mb-4">Alphabet Circle</h2>
+      
+      <div className="mb-6 w-full max-w-md">
+        <div className="flex items-center mb-2">
+          <div className="flex-grow p-3 bg-white border border-gray-300 rounded-lg text-xl font-medium min-h-12">
+            {typedWord || <span className="text-gray-400">Type a word...</span>}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+      
+      <div className="relative" style={{ 
+        width: `${radius * 2 + letterRadius * 2}px`, 
+        height: `${radius * 2 + letterRadius * 2}px` 
+      }}>
+        {/* Main circle */}
+        {/* <div 
+          className="absolute border-2 border-gray-300 rounded-full"
+          style={{
+            width: `${radius * 2}px`,
+            height: `${radius * 2}px`,
+            top: `${letterRadius}px`,
+            left: `${letterRadius}px`
+          }}
+        /> */}
+        
+        <div
+          className="absolute flex flex-col gap-3 items-center justify-center"
+          style={{
+            width: `${radius}px`,
+            height: `${radius}px`,
+            top: `${radius + letterRadius - radius/2}px`,
+            left: `${radius + letterRadius - radius/2}px`
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <button 
+            onClick={toggleCase}
+            className={`px-4 py-2 ${isUppercase ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg w-32 text-sm font-medium`}
+          >
+            Shift
+          </button>
+
+          <button 
+            onClick={handleBackspace}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 text-sm font-medium"
+          >
+            Backspace
+          </button>
+          
+          <button 
+            onClick={handleClear}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 text-sm font-medium"
+          >
+            Clear
+          </button>
+        </div>
+        
+        {alphabet.map((letter, index) => {
+          const { x, y } = calculatePosition(index, alphabet.length);
+          return (
+            <div
+              key={letter}
+              className={`absolute flex items-center justify-center rounded-full cursor-pointer transition-all duration-200 ${
+                recentLetter === letter ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 hover:bg-blue-100'
+              }`}
+              style={{
+                width: `${letterRadius * 2}px`,
+                height: `${letterRadius * 2}px`,
+                top: `${y + radius + letterRadius}px`,
+                left: `${x + radius + letterRadius}px`,
+                border: '2px solid',
+                borderColor: recentLetter === letter ? 'rgb(59, 130, 246)' : 'rgb(209, 213, 219)'
+              }}
+              onClick={() => handleLetterClick(letter)}
+            >
+              <span className="font-bold">{letter}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
