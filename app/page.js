@@ -45,10 +45,14 @@ export default function AlphabetCircle() {
   const toggleCase = () => {
     setIsUppercase(prev => !prev);
   };
+
+  const handleSpace = () => {
+    setTypedWord(prev => prev + " ");
+  };
   
   return (
     <div className="flex flex-col items-center p-8 rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Alphabet Circle</h2>
+      <h2 className="text-2xl font-bold mb-4">DialBoard</h2>
       
       <div className="mb-6 w-full max-w-md">
         <div className="flex items-center mb-2">
@@ -62,7 +66,6 @@ export default function AlphabetCircle() {
         width: `${radius * 2 + letterRadius * 2}px`, 
         height: `${radius * 2 + letterRadius * 2}px` 
       }}>
-        {/* Main circle */}
         {/* <div 
           className="absolute border-2 border-gray-300 rounded-full"
           style={{
@@ -74,7 +77,7 @@ export default function AlphabetCircle() {
         /> */}
         
         <div
-          className="absolute flex flex-col gap-3 items-center justify-center"
+          className="absolute ml-5 grid grid-cols-2 gap-3 items-center justify-center"
           style={{
             width: `${radius}px`,
             height: `${radius}px`,
@@ -82,26 +85,14 @@ export default function AlphabetCircle() {
             left: `${radius + letterRadius - radius/2}px`
           }}
         >
-          <button 
-            onClick={toggleCase}
-            className={`px-4 py-2 ${isUppercase ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg w-32 text-sm font-medium`}
-          >
-            Shift
-          </button>
+          <button onClick={toggleCase} className={`px-4  -ml-3 py-10 ${isUppercase ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg w-24 text-sm font-medium`}>Shift</button>
 
-          <button 
-            onClick={handleBackspace}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 text-sm font-medium"
-          >
-            Backspace
-          </button>
+          <button onClick={handleBackspace} className="px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium"> Backspace </button>
           
-          <button 
-            onClick={handleClear}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 text-sm font-medium"
-          >
-            Clear
-          </button>
+          <button onClick={handleClear} className="px-4 -ml-3  py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium">Clear</button>
+
+          <button onClick={handleSpace} className="px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium">Space</button>
+        
         </div>
         
         {alphabet.map((letter, index) => {
