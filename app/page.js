@@ -114,7 +114,7 @@ export default function AlphabetCircle() {
     if (typedWord.length > 0 || clearClicked) {
       console.log('Keystroke Log:', keystrokeLog);
       console.log('Current Text:', typedWord);
-      if (startTime) {
+      if (clearClicked) {
         const elapsedSec = (now() - startTime) / 1000;
         const adjustedWPM = ((typedWord.length - 1) / elapsedSec) * (60 / 5);
         console.log('Elapsed Time:', elapsedSec.toFixed(2), 'sec');
