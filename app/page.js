@@ -153,21 +153,21 @@ export default function AlphabetCircle() {
         /> */}
 
         <div
-          className="absolute ml-5 grid grid-cols-2 gap-3 items-center justify-center"
+          className="absolute  grid grid-cols-2 gap-3 items-center justify-center"
           style={{
-            width: `${radius}px`,
-            height: `${radius}px`,
-            top: `${radius + letterRadius - radius / 2}px`,
-            left: `${radius + letterRadius - radius / 2}px`
+            width: `${radius+100}px`,
+            height: `${radius + 100}px`,
+            top: `${radius + letterRadius - (radius + 60) / 2}px`,
+            left: `${radius + letterRadius - (radius + 50) / 2}px`
           }}
         >
-          <button onClick={toggleCase} className={`px-4  -ml-3 py-10 ${isUppercase ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg w-24 text-sm font-medium`}>Shift</button>
+          <button onClick={toggleCase} className={`rounded-tl-full px-4  py-10 ${isUppercase ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg w-32 h-32 text-sm font-medium`}>Shift</button>
 
-          <button onClick={handleBackspace} className="px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium"> Backspace </button>
+          <button onClick={handleBackspace} className="rounded-tr-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32  text-sm font-medium"> Backspace </button>
 
-          <button onClick={handleClear} className="px-4 -ml-3  py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium">Clear</button>
+          <button onClick={handleClear} className="rounded-bl-full px-4  py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium">Clear</button>
 
-          <button onClick={handleSpace} className="px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium">Space</button>
+          <button onClick={handleSpace} className="rounded-br-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32  text-sm font-medium">Space</button>
 
         </div>
 
