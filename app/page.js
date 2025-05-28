@@ -87,7 +87,8 @@ export default function AlphabetCircle() {
   
   return (
     <div className="flex flex-col items-center p-8 rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">DialBoard</h2>
+      <h2 className="text-2xl font-bold mb-4 text-blue-600">DialBoard</h2>
+      <h3 className="text-xl font-bold mb-4">[Sentence to write]</h3>
       
       <div className="mb-6 w-full max-w-md">
         <div className="flex items-center mb-2">
