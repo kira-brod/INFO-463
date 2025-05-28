@@ -11,6 +11,7 @@ export default function AlphabetCircle() {
 
   const [keystrokeLog, setKeystrokeLog] = useState([]);
   const [startTime, setStartTime] = useState(null);
+  const [clearClicked, setClearClicked] = useState(false)
 
 
   const sentences = ["She packed twelve blue pens in her small bag.",
@@ -65,6 +66,11 @@ export default function AlphabetCircle() {
   };
 
   const handleLetterClick = (letter) => {
+
+    if (clearClicked){
+      setKeystrokeLog([]);
+      setClearClicked(false)
+    }
     setTypedWord(prev => prev + letter);
     setRecentLetter(letter);
     logKeystroke('letter', letter);
@@ -82,10 +88,12 @@ export default function AlphabetCircle() {
   };
 
   const handleClear = () => {
+    setClearClicked(true)
     setTypedWord('');
-    setKeystrokeLog([]);
-    setStartTime(null);
     logKeystroke('clear', 'X');
+    // setKeystrokeLog([]);
+    setStartTime(null);
+    // logKeystroke('clear', 'X');
   };
 
   const toggleCase = () => {
@@ -103,7 +111,7 @@ export default function AlphabetCircle() {
   }
 
   useEffect(() => {
-    if (typedWord.length > 0) {
+    if (typedWord.length > 0 || clearClicked) {
       console.log('Keystroke Log:', keystrokeLog);
       console.log('Current Text:', typedWord);
       if (startTime) {
