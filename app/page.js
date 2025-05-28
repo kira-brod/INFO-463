@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function AlphabetCircle() {
   const radius = 181;
@@ -8,6 +8,21 @@ export default function AlphabetCircle() {
   const [typedWord, setTypedWord] = useState('');
   const [recentLetter, setRecentLetter] = useState(null);
   const [isUppercase, setIsUppercase] = useState(true);
+
+  const [keystrokeLog, setKeystrokeLog] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+
+  const now = () => new Date().getTime();
+
+  useEffect(() => {
+    if (typedWord.length === 1 && keystrokeLog.length === 0) {
+      setStartTime(now());
+    }
+  }, [typedWord]);
+
+  const logKeystroke = (type, value) => {
+    setKeystrokeLog(prev => [...prev, { time: now(), type, value }]);
+  };
   
   const generateAlphabet = () => {
     const startCharCode = isUppercase ? 65 : 97; // ASCII for 'A' or 'a'
@@ -26,7 +41,8 @@ export default function AlphabetCircle() {
   const handleLetterClick = (letter) => {
     setTypedWord(prev => prev + letter);
     setRecentLetter(letter);
-    
+    logKeystroke('letter', letter);
+
     setTimeout(() => {
       if (recentLetter === letter) {
         setRecentLetter(null);
@@ -36,19 +52,38 @@ export default function AlphabetCircle() {
   
   const handleBackspace = () => {
     setTypedWord(prev => prev.slice(0, -1));
+    logKeystroke('backspace', '<');
   };
   
   const handleClear = () => {
     setTypedWord('');
+    setKeystrokeLog([]);
+    setStartTime(null);
+    logKeystroke('clear', 'X');
   };
   
   const toggleCase = () => {
     setIsUppercase(prev => !prev);
+    logKeystroke('shift', 'shift');
   };
 
   const handleSpace = () => {
     setTypedWord(prev => prev + " ");
+    logKeystroke('space', ' ');
   };
+
+  useEffect(() => {
+    if (typedWord.length > 0) {
+      console.log('Keystroke Log:', keystrokeLog);
+      console.log('Current Text:', typedWord);
+      if (startTime) {
+        const elapsedSec = (now() - startTime) / 1000;
+        const adjustedWPM = ((typedWord.length - 1) / elapsedSec) * (60 / 5);
+        console.log('Elapsed Time:', elapsedSec.toFixed(2), 'sec');
+        console.log('Adjusted WPM:', adjustedWPM.toFixed(2));
+      }
+    }
+  }, [typedWord]);
   
   return (
     <div className="flex flex-col items-center p-8 rounded-lg">
