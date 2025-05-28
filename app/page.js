@@ -34,7 +34,6 @@ export default function AlphabetCircle() {
     "The artist painted scenes from her memory.",
     "They danced all night under the glowing moon."]
 
-  const [index, setIndex] = useState(0)
   const [sentence, setSentence] = useState(sentences[index])
 
   // var index = 0
@@ -100,9 +99,7 @@ export default function AlphabetCircle() {
   };
 
   const handleRefresh = () => {
-    setIndex(Math.floor(Math.random() * 20))
-    console.log(index)
-    setSentence(sentences[index])
+    setSentence(sentences[Math.floor(Math.random() * 20)])
   }
 
   useEffect(() => {
