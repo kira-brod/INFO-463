@@ -34,9 +34,9 @@ export default function AlphabetCircle() {
     "The artist painted scenes from her memory.",
     "They danced all night under the glowing moon."]
 
-  const [sentence, setSentence] = useState(sentences[index])
+  const [sentence, setSentence] = useState(sentences[0])
 
-  // var index = 0
+  
 
   const now = () => new Date().getTime();
 
