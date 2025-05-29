@@ -12,6 +12,8 @@ export default function AlphabetCircle() {
   const [keystrokeLog, setKeystrokeLog] = useState([]);
   const [startTime, setStartTime] = useState(null);
   const [clearClicked, setClearClicked] = useState(false)
+  const [submitClicked, setSubmitClicked] = useState(false)
+
 
 
   const sentences = ["She packed twelve blue pens in her small bag.",
@@ -37,7 +39,7 @@ export default function AlphabetCircle() {
 
   const [sentence, setSentence] = useState(sentences[0])
 
-  
+
 
   const now = () => new Date().getTime();
 
@@ -67,10 +69,15 @@ export default function AlphabetCircle() {
 
   const handleLetterClick = (letter) => {
 
-    if (clearClicked){
-      setKeystrokeLog([]);
-      setClearClicked(false)
+    // if (clearClicked) {
+    //   setKeystrokeLog([]);
+    //   setClearClicked(false)
+    // }
+
+    if (submitClicked){
+      setSubmitClicked(false)
     }
+    
     setTypedWord(prev => prev + letter);
     setRecentLetter(letter);
     logKeystroke('letter', letter);
@@ -88,13 +95,22 @@ export default function AlphabetCircle() {
   };
 
   const handleClear = () => {
-    setClearClicked(true)
     setTypedWord('');
-    logKeystroke('clear', 'X');
-    // setKeystrokeLog([]);
-    setStartTime(null);
     // logKeystroke('clear', 'X');
+    setKeystrokeLog([]);
+    setStartTime(null);
+    logKeystroke('clear', 'X');
   };
+
+  const handleSubmit = () => {
+    setTypedWord(prev => prev + " ");
+    setSubmitClicked(true)
+    logKeystroke('submit', 'X');
+    // console.log("submit")
+    console.log('Keystroke Log:', keystrokeLog);
+    // setClearClicked(true)
+
+  }
 
   const toggleCase = () => {
     setIsUppercase(prev => !prev);
@@ -111,7 +127,7 @@ export default function AlphabetCircle() {
   }
 
   useEffect(() => {
-    if (typedWord.length > 0 || clearClicked) {
+    if (typedWord.length > 0 || submitClicked) {
       console.log('Keystroke Log:', keystrokeLog);
       console.log('Current Text:', typedWord);
       if (clearClicked) {
@@ -127,7 +143,10 @@ export default function AlphabetCircle() {
     <div className="flex flex-col items-center pt-3 p-8 rounded-lg">
       <h2 className="text-2xl font-bold mb-4 text-blue-600">DialBoard</h2>
       <h3 className="text-xl font-bold mb-2">{sentence}</h3>
-      <button onClick={handleRefresh} className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'>Refresh</button>
+      <div className='grid grid-cols-2'>
+        <button onClick={handleRefresh} className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'>Refresh</button>
+        <button onClick={handleSubmit} className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'>Submit</button>
+      </div>
 
 
       <div className="mb-2 w-full max-w-md">
@@ -155,7 +174,7 @@ export default function AlphabetCircle() {
         <div
           className="absolute  grid grid-cols-2 gap-3 items-center justify-center"
           style={{
-            width: `${radius+100}px`,
+            width: `${radius + 100}px`,
             height: `${radius + 100}px`,
             top: `${radius + letterRadius - (radius + 60) / 2}px`,
             left: `${radius + letterRadius - (radius + 50) / 2}px`
