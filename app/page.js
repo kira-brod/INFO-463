@@ -14,6 +14,8 @@ export default function AlphabetCircle() {
   const [clearClicked, setClearClicked] = useState(false)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [shiftLocked, setShiftLocked] = useState(false);
+  const [session, setSession] = useState([])
+  const [indexSess, setIndexSess] = useState(0)
 
 
 
@@ -44,6 +46,25 @@ export default function AlphabetCircle() {
 
 
   const now = () => new Date().getTime();
+
+  const [status, setStatus] = useState('');
+
+  const handleWriteJson = async () => {
+    // const arrayData = ['apple', 'banana', 'cherry'];
+
+    const res = await fetch('/api/write-json', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ data: keystrokeLog }),
+    });
+
+    console.log("saved")
+    const result = await res.json();
+    setStatus(result.message);
+  };
+  
 
   useEffect(() => {
     if (typedWord.length === 1 && keystrokeLog.length === 0) {
@@ -134,6 +155,8 @@ export default function AlphabetCircle() {
     // console.log("submit")
     console.log('Keystroke Log:', keystrokeLog);
     // setClearClicked(true)
+    // setSession(prev => [...prev, "session ",{ time: now(), type, value }]);
+    console.log(session)
 
   }
 
@@ -239,7 +262,7 @@ export default function AlphabetCircle() {
     <div className="flex flex-col items-center pt-3 p-8 rounded-lg">
       <h2 className="text-2xl font-bold mb-4 text-blue-600">DialBoard</h2>
       <h3 className="text-xl font-bold mb-2">{sentence}</h3>
-      <div className='grid grid-cols-2'>
+      <div className='grid grid-cols-3'>
         <button
           onClick={handleRefresh}
           className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'
@@ -251,6 +274,12 @@ export default function AlphabetCircle() {
           className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'
         >
           Submit
+        </button>
+        <button
+          onClick={handleWriteJson}
+          className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'
+        >
+          Save
         </button>
       </div>
   
