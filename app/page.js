@@ -308,7 +308,7 @@ export default function AlphabetCircle() {
             width: `${radius + 120}px`,
             height: `${radius + 120}px`,
             top: `${radius + letterRadius - (radius + 80) / 2}px`,
-            left: `${radius + letterRadius - (radius + 80) / 2}px`
+            left: `${radius + letterRadius - (radius + 60) / 2}px`
           }}
         >
          <button
@@ -317,7 +317,7 @@ export default function AlphabetCircle() {
               isUppercase
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 hover:bg-gray-300'
-            } rounded-lg w-32 h-32 text-sm font-medium`}
+            } rounded-lg w-36 h-36 text-sm font-medium`}
           >
             {shiftLocked ? 'Caps Lock' : shiftTemporary ? 'Shift ' : 'Shift'}
         </button>
@@ -326,21 +326,21 @@ export default function AlphabetCircle() {
   
           <button
             onClick={handleBackspace}
-            className="rounded-tr-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium"
+            className="rounded-tr-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-36 h-36 text-sm font-medium"
           >
             Backspace
           </button>
   
           <button
             onClick={handleClear}
-            className="rounded-bl-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium"
+            className="rounded-bl-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-36 h-36 text-sm font-medium"
           >
             Clear
           </button>
   
           <button
             onClick={handleSpace}
-            className="rounded-br-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium"
+            className="rounded-br-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-36 h-36 text-sm font-medium"
           >
             Space
           </button>
@@ -352,7 +352,7 @@ export default function AlphabetCircle() {
     setRecentLetter(null);
     setSuggestions([]);
   }}
-  className="absolute bg-gray-200 hover:bg-gray-300 rounded-md px-3 py-1 text-sm font-medium shadow"
+  className="absolute bg-fuchsia-300 hover:bg-fuchsia-400 rounded-full px-3 py-1 text-sm font-medium w-20 h-20 shadow"
   style={{
     top: '50%',
     left: '50%',
