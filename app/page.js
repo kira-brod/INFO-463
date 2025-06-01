@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 
 export default function AlphabetCircle() {
-  const radius = 181;
+  const radius = 200;
   const letterRadius = 21;
 
   const [typedWord, setTypedWord] = useState('');
@@ -16,30 +16,32 @@ export default function AlphabetCircle() {
   const [shiftLocked, setShiftLocked] = useState(false);
   const [session, setSession] = useState([])
   const [indexSess, setIndexSess] = useState(0)
+  const [isSymbolsMode, setIsSymbolsMode] = useState(false);
 
 
 
 
-  const sentences = ["She packed twelve blue pens in her small bag.",
-    "Every bird sang sweet songs in the quiet dawn.",
-    "They watched clouds drift across the golden sky.",
-    "A clever mouse slipped past the sleepy cat.",
-    "Green leaves danced gently in the warm breeze.",
-    "He quickly wrote notes before the test began.",
-    "The tall man wore boots made of soft leather.",
-    "Old clocks ticked loudly in the silent room.",
-    "She smiled while sipping tea on the front porch.",
-    "We found a hidden path behind the old barn.",
-    "Sunlight streamed through cracks in the ceiling.",
-    "Dogs barked at shadows moving through the yard.",
-    "Rain tapped softly against the window glass.",
-    "Bright stars twinkled above the quiet valley.",
-    "He tied the package with ribbon and string.",
-    "A sudden breeze blew papers off the desk.",
-    "The curious child opened every single drawer.",
-    "Fresh apples fell from the heavy tree limbs.",
-    "The artist painted scenes from her memory.",
-    "They danced all night under the glowing moon."]
+
+  const sentences = ["She packed twelve blue pens in her small bag",
+    "Every bird sang sweet songs in the quiet dawn",
+    "They watched clouds drift across the golden sky",
+    "A clever mouse slipped past the sleepy cat",
+    "Green leaves danced gently in the warm breeze",
+    "He quickly wrote notes before the test began",
+    "The tall man wore boots made of soft leather",
+    "Old clocks ticked loudly in the silent room",
+    "She smiled while sipping tea on the front porch",
+    "We found a hidden path behind the old barn",
+    "Sunlight streamed through cracks in the ceiling",
+    "Dogs barked at shadows moving through the yard",
+    "Rain tapped softly against the window glass",
+    "Bright stars twinkled above the quiet valley",
+    "He tied the package with ribbon and string",
+    "A sudden breeze blew papers off the desk",
+    "The curious child opened every single drawer",
+    "Fresh apples fell from the heavy tree limbs",
+    "The artist painted scenes from her memory",
+    "They danced all night under the glowing moon"]
 
   const [sentence, setSentence] = useState(sentences[0])
 
@@ -85,12 +87,17 @@ export default function AlphabetCircle() {
   };
 
  const generateAlphabet = () => {
-  const abcCircle = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  return isUppercase ? abcCircle : abcCircle.map(l => l.toLowerCase());
+  if (isSymbolsMode) {
+    return ['.', ',', '?', '!', "'", '"', ':', ';', '-', '_', '(', ')', '/', '\\', '@', '#', '$', '%', '&', '*', '+', '='];
+  }
+
+  const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  return isUppercase ? base : base.map(l => l.toLowerCase());
 };
 
 
-  const alphabet = useMemo(() => generateAlphabet(), [isUppercase]);
+  const alphabet = useMemo(() => generateAlphabet(), [isUppercase, isSymbolsMode]);
+
 
   const calculatePosition = (index, totalItems) => {
     const angle = (index * 2 * Math.PI) / totalItems - Math.PI / 2;
@@ -298,22 +305,22 @@ export default function AlphabetCircle() {
         <div
           className="absolute grid grid-cols-2 gap-3 items-center justify-center"
           style={{
-            width: `${radius + 100}px`,
-            height: `${radius + 100}px`,
-            top: `${radius + letterRadius - (radius + 60) / 2}px`,
-            left: `${radius + letterRadius - (radius + 50) / 2}px`
+            width: `${radius + 120}px`,
+            height: `${radius + 120}px`,
+            top: `${radius + letterRadius - (radius + 80) / 2}px`,
+            left: `${radius + letterRadius - (radius + 80) / 2}px`
           }}
         >
          <button
-  onClick={toggleCase}
-  className={`rounded-tl-full px-4 py-10 ${
-    isUppercase
-      ? 'bg-blue-500 text-white'
-      : 'bg-gray-200 hover:bg-gray-300'
-  } rounded-lg w-32 h-32 text-sm font-medium`}
->
-  {shiftLocked ? 'Caps Lock' : shiftTemporary ? 'Shift ' : 'Shift'}
-</button>
+            onClick={toggleCase}
+            className={`rounded-tl-full px-4 py-10 ${
+              isUppercase
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 hover:bg-gray-300'
+            } rounded-lg w-32 h-32 text-sm font-medium`}
+          >
+            {shiftLocked ? 'Caps Lock' : shiftTemporary ? 'Shift ' : 'Shift'}
+        </button>
 
 
   
@@ -337,6 +344,29 @@ export default function AlphabetCircle() {
           >
             Space
           </button>
+          {/* Toggle Symbols Button - Center of the 4 control buttons */}
+          
+<button
+  onClick={() => {
+    setIsSymbolsMode(prev => !prev);
+    setRecentLetter(null);
+    setSuggestions([]);
+  }}
+  className="absolute bg-gray-200 hover:bg-gray-300 rounded-md px-3 py-1 text-sm font-medium shadow"
+  style={{
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 50,
+  }}
+>
+  {isSymbolsMode ? 'ABC' : '123'}
+</button>
+
+
+
+
+
         </div>
   
         {/* Letter Bubbles */}
