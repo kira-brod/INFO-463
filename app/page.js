@@ -82,6 +82,11 @@ export default function AlphabetCircle() {
     setRecentLetter(letter);
     logKeystroke('letter', letter);
 
+    const index = alphabet.indexOf(letter);
+    const { x, y } = calculatePosition(index, alphabet.length);
+    setLastClickedPos({ x, y });
+    setSuggestions(getSuggestions(letter));
+
     setTimeout(() => {
       if (recentLetter === letter) {
         setRecentLetter(null);
@@ -138,6 +143,43 @@ export default function AlphabetCircle() {
       }
     }
   }, [typedWord]);
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [lastClickedPos, setLastClickedPos] = useState({ x: 0, y: 0 });
+
+  const staticSuggestions = {
+    A: ['N', 'L', 'T'],
+    B: ['E', 'R', 'A'],
+    C: ['H', 'O', 'K'],
+    D: ['E', 'A', 'I'],
+    E: ['R', 'S', 'D'],
+    F: ['O', 'I', 'U'],
+    G: ['H', 'O', 'A'],
+    H: ['E', 'I', 'O'],
+    I: ['N', 'S', 'T'],
+    J: ['U', 'O', 'A'],
+    K: ['E', 'I', 'O'],
+    L: ['L', 'E', 'Y'],
+    M: ['E', 'O', 'I'],
+    N: ['G', 'T', 'E'],
+    O: ['U', 'N', 'R'],
+    P: ['L', 'A', 'E'],
+    Q: ['U', 'I', 'A'],
+    R: ['E', 'I', 'A'],
+    S: ['T', 'H', 'I'],
+    T: ['H', 'E', 'O'],
+    U: ['S', 'R', 'L'],
+    V: ['E', 'I', 'A'],
+    W: ['A', 'E', 'O'],
+    X: ['P', 'C', 'T'],
+    Y: ['O', 'E', 'A'],
+    Z: ['A', 'E', 'I'],
+  };
+  
+  const getSuggestions = (lastLetter) => {
+    return staticSuggestions[lastLetter.toUpperCase()] || [];
+  };
+  
 
   return (
     <div className="flex flex-col items-center pt-3 p-8 rounded-lg">
@@ -211,6 +253,40 @@ export default function AlphabetCircle() {
             </div>
           );
         })}
+        {suggestions.map((sugg, i) => {
+          const index = alphabet.indexOf(recentLetter);
+          const baseAngle = (index * 2 * Math.PI) / alphabet.length - Math.PI / 2;
+          const angleOffset = (i - 1) * (Math.PI / 15); 
+          const angle = baseAngle + angleOffset;
+          const dist = radius + 50; 
+
+          const x = dist * Math.cos(angle);
+          const y = dist * Math.sin(angle);
+
+          return (
+            <div
+              key={sugg}
+              className="absolute flex items-center justify-center rounded-full text-gray-800 bg-yellow-300 hover:bg-yellow-400 font-semibold transition-all shadow-md"
+              style={{
+                width: `${letterRadius * 2}px`,
+                height: `${letterRadius * 2}px`,
+                top: `${y + radius + letterRadius}px`,
+                left: `${x + radius + letterRadius}px`,
+                border: '2px solid #facc15',
+                zIndex: 20,
+                cursor: 'pointer'
+              }}
+              onClick={() => handleLetterClick(sugg)}
+            >
+              {sugg}
+    </div>
+  );
+})}
+
+
+
+
+        
       </div>
     </div>
   );
