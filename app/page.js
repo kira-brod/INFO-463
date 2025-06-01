@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 
 export default function AlphabetCircle() {
   const radius = 181;
@@ -13,6 +13,8 @@ export default function AlphabetCircle() {
   const [startTime, setStartTime] = useState(null);
   const [clearClicked, setClearClicked] = useState(false)
   const [submitClicked, setSubmitClicked] = useState(false)
+  const [shiftLocked, setShiftLocked] = useState(false);
+
 
 
 
@@ -49,16 +51,28 @@ export default function AlphabetCircle() {
     }
   }, [typedWord]);
 
+  useEffect(() => {
+  if (recentLetter) {
+    const updated = staticSuggestions[recentLetter.toUpperCase()] || [];
+    setSuggestions(isUppercase ? updated : updated.map(l => l.toLowerCase()));
+  }
+}, [isUppercase]);
+
+
   const logKeystroke = (type, value) => {
     setKeystrokeLog(prev => [...prev, { time: now(), type, value }]);
   };
 
   const generateAlphabet = () => {
-    const startCharCode = isUppercase ? 65 : 97; // ASCII for 'A' or 'a'
-    return Array.from({ length: 26 }, (_, i) => String.fromCharCode(startCharCode + i));
+    const qwertyCircle = [
+      'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+      'L', 'K', 'J', 'H', 'G', 'F', 'D', 'S', 'A',
+      'Z', 'X', 'C', 'V', 'B', 'N', 'M'
+    ];
+    return isUppercase ? qwertyCircle : qwertyCircle.map(l => l.toLowerCase());
   };
 
-  const alphabet = generateAlphabet();
+  const alphabet = useMemo(() => generateAlphabet(), [isUppercase]);
 
   const calculatePosition = (index, totalItems) => {
     const angle = (index * 2 * Math.PI) / totalItems - Math.PI / 2;
@@ -81,6 +95,12 @@ export default function AlphabetCircle() {
     setTypedWord(prev => prev + letter);
     setRecentLetter(letter);
     logKeystroke('letter', letter);
+    
+    if (shiftTemporary && !shiftLocked) {
+      setIsUppercase(false);
+      setShiftTemporary(false);
+    }
+    
 
     const index = alphabet.indexOf(letter);
     const { x, y } = calculatePosition(index, alphabet.length);
@@ -117,10 +137,43 @@ export default function AlphabetCircle() {
 
   }
 
+  const [shiftTemporary, setShiftTemporary] = useState(false);
+
+  const lastShiftTapTime = useRef(0);
+
+
   const toggleCase = () => {
-    setIsUppercase(prev => !prev);
+    const nowTap = Date.now();
+    const timeSinceLastTap = nowTap - lastShiftTapTime.current;
+  
+    if (shiftLocked) {
+      setIsUppercase(false);
+      setShiftLocked(false);
+      setShiftTemporary(false);
+    }
+  
+    
+    else if (timeSinceLastTap < 400) {
+      setIsUppercase(true);
+      setShiftLocked(true);
+      setShiftTemporary(false);
+    }
+  
+
+    else {
+      setIsUppercase(true);
+      setShiftTemporary(true);
+      setShiftLocked(false);
+    }
+  
+    lastShiftTapTime.current = nowTap;
     logKeystroke('shift', 'shift');
   };
+  
+  
+  
+  
+
 
   const handleSpace = () => {
     setTypedWord(prev => prev + " ");
@@ -177,7 +230,8 @@ export default function AlphabetCircle() {
   };
   
   const getSuggestions = (lastLetter) => {
-    return staticSuggestions[lastLetter.toUpperCase()] || [];
+    const baseSuggestions = staticSuggestions[lastLetter.toUpperCase()] || [];
+    return isUppercase ? baseSuggestions : baseSuggestions.map(l => l.toLowerCase());
   };
   
 
@@ -186,11 +240,20 @@ export default function AlphabetCircle() {
       <h2 className="text-2xl font-bold mb-4 text-blue-600">DialBoard</h2>
       <h3 className="text-xl font-bold mb-2">{sentence}</h3>
       <div className='grid grid-cols-2'>
-        <button onClick={handleRefresh} className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'>Refresh</button>
-        <button onClick={handleSubmit} className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'>Submit</button>
+        <button
+          onClick={handleRefresh}
+          className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'
+        >
+          Refresh
+        </button>
+        <button
+          onClick={handleSubmit}
+          className='px-4 mb-4 mx-10 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg w-24 text-sm font-medium'
+        >
+          Submit
+        </button>
       </div>
-
-
+  
       <div className="mb-2 w-full max-w-md">
         <div className="flex items-center mb-2">
           <div className="flex-grow p-3 bg-white border border-gray-300 rounded-lg text-xl font-medium min-h-12">
@@ -198,23 +261,16 @@ export default function AlphabetCircle() {
           </div>
         </div>
       </div>
-
-      <div className="relative" style={{
-        width: `${radius * 2 + letterRadius * 2}px`,
-        height: `${radius * 2 + letterRadius * 2}px`
-      }}>
-        {/* <div 
-          className="absolute border-2 border-gray-300 rounded-full"
-          style={{
-            width: `${radius * 2}px`,
-            height: `${radius * 2}px`,
-            top: `${letterRadius}px`,
-            left: `${letterRadius}px`
-          }}
-        /> */}
-
+  
+      <div
+        className="relative"
+        style={{
+          width: `${radius * 2 + letterRadius * 2}px`,
+          height: `${radius * 2 + letterRadius * 2}px`
+        }}
+      >
         <div
-          className="absolute  grid grid-cols-2 gap-3 items-center justify-center"
+          className="absolute grid grid-cols-2 gap-3 items-center justify-center"
           style={{
             width: `${radius + 100}px`,
             height: `${radius + 100}px`,
@@ -222,30 +278,62 @@ export default function AlphabetCircle() {
             left: `${radius + letterRadius - (radius + 50) / 2}px`
           }}
         >
-          <button onClick={toggleCase} className={`rounded-tl-full px-4  py-10 ${isUppercase ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg w-32 h-32 text-sm font-medium`}>Shift</button>
+         <button
+  onClick={toggleCase}
+  className={`rounded-tl-full px-4 py-10 ${
+    isUppercase
+      ? 'bg-blue-500 text-white'
+      : 'bg-gray-200 hover:bg-gray-300'
+  } rounded-lg w-32 h-32 text-sm font-medium`}
+>
+  {shiftLocked ? 'Caps Lock' : shiftTemporary ? 'Shift ' : 'Shift'}
+</button>
 
-          <button onClick={handleBackspace} className="rounded-tr-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32  text-sm font-medium"> Backspace </button>
 
-          <button onClick={handleClear} className="rounded-bl-full px-4  py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium">Clear</button>
-
-          <button onClick={handleSpace} className="rounded-br-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32  text-sm font-medium">Space</button>
-
+  
+          <button
+            onClick={handleBackspace}
+            className="rounded-tr-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium"
+          >
+            Backspace
+          </button>
+  
+          <button
+            onClick={handleClear}
+            className="rounded-bl-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium"
+          >
+            Clear
+          </button>
+  
+          <button
+            onClick={handleSpace}
+            className="rounded-br-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-32 h-32 text-sm font-medium"
+          >
+            Space
+          </button>
         </div>
-
+  
+        {/* Letter Bubbles */}
         {alphabet.map((letter, index) => {
           const { x, y } = calculatePosition(index, alphabet.length);
           return (
             <div
               key={letter}
-              className={`absolute flex items-center justify-center rounded-full cursor-pointer transition-all duration-200 ${recentLetter === letter ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 hover:bg-blue-100'
-                }`}
+              className={`absolute flex items-center justify-center rounded-full cursor-pointer transition-all duration-200 ${
+                recentLetter === letter
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white text-gray-800 hover:bg-blue-100'
+              }`}
               style={{
                 width: `${letterRadius * 2}px`,
                 height: `${letterRadius * 2}px`,
                 top: `${y + radius + letterRadius}px`,
                 left: `${x + radius + letterRadius}px`,
                 border: '2px solid',
-                borderColor: recentLetter === letter ? 'rgb(59, 130, 246)' : 'rgb(209, 213, 219)'
+                borderColor:
+                  recentLetter === letter
+                    ? 'rgb(59, 130, 246)'
+                    : 'rgb(209, 213, 219)'
               }}
               onClick={() => handleLetterClick(letter)}
             >
@@ -253,16 +341,22 @@ export default function AlphabetCircle() {
             </div>
           );
         })}
+  
+        {/* Suggestion Bubbles */}
         {suggestions.map((sugg, i) => {
-          const index = alphabet.indexOf(recentLetter);
+          const normalized =
+            isUppercase && recentLetter
+              ? recentLetter.toUpperCase()
+              : recentLetter?.toLowerCase();
+          const index = alphabet.indexOf(normalized);
           const baseAngle = (index * 2 * Math.PI) / alphabet.length - Math.PI / 2;
-          const angleOffset = (i - 1) * (Math.PI / 15); 
+          const angleOffset = (i - 1) * (Math.PI / 15);
           const angle = baseAngle + angleOffset;
-          const dist = radius + 50; 
-
+          const dist = radius + 50;
+  
           const x = dist * Math.cos(angle);
           const y = dist * Math.sin(angle);
-
+  
           return (
             <div
               key={sugg}
@@ -279,15 +373,11 @@ export default function AlphabetCircle() {
               onClick={() => handleLetterClick(sugg)}
             >
               {sugg}
-    </div>
-  );
-})}
-
-
-
-
-        
+            </div>
+          );
+        })}
       </div>
     </div>
   );
+  
 }
