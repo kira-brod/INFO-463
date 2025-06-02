@@ -9,7 +9,9 @@ export default function AlphabetCircle() {
   const [recentLetter, setRecentLetter] = useState(null);
   const [isUppercase, setIsUppercase] = useState(true);
 
-  const [keystrokeLog, setKeystrokeLog] = useState([]);
+  const [keystrokeLog, setKeystrokeLog] = useState([]); // array of session objects
+  const [currentKeystrokes, setCurrentKeystrokes] = useState([]); // for current session
+
   const [startTime, setStartTime] = useState(null);
   const [clearClicked, setClearClicked] = useState(false)
   const [submitClicked, setSubmitClicked] = useState(false)
@@ -52,8 +54,6 @@ export default function AlphabetCircle() {
   const [status, setStatus] = useState('');
 
   const handleWriteJson = async () => {
-    // const arrayData = ['apple', 'banana', 'cherry'];
-
     const res = await fetch('/api/write-json', {
       method: 'POST',
       headers: {
@@ -62,11 +62,16 @@ export default function AlphabetCircle() {
       body: JSON.stringify({ data: keystrokeLog }),
     });
 
-    console.log("saved")
-    const result = await res.json();
-    setStatus(result.message);
+    const result = await res.json().catch(() => ({
+      message: 'Error parsing server response',
+      error: true,
+    }));
+
+    console.log(result);
+    setStatus(result.message || 'Saved');
   };
-  
+
+
 
   useEffect(() => {
     if (typedWord.length === 1 && keystrokeLog.length === 0) {
@@ -75,25 +80,25 @@ export default function AlphabetCircle() {
   }, [typedWord]);
 
   useEffect(() => {
-  if (recentLetter) {
-    const updated = staticSuggestions[recentLetter.toUpperCase()] || [];
-    setSuggestions(isUppercase ? updated : updated.map(l => l.toLowerCase()));
-  }
-}, [isUppercase]);
+    if (recentLetter) {
+      const updated = staticSuggestions[recentLetter.toUpperCase()] || [];
+      setSuggestions(isUppercase ? updated : updated.map(l => l.toLowerCase()));
+    }
+  }, [isUppercase]);
 
 
   const logKeystroke = (type, value) => {
-    setKeystrokeLog(prev => [...prev, { time: now(), type, value }]);
+    setCurrentKeystrokes(prev => [...prev, { time: now(), type, value }]);
   };
 
- const generateAlphabet = () => {
-  if (isSymbolsMode) {
-    return ['.', ',', '?', '!', "'", '"', ':', ';', '-', '_', '(', ')', '/', '\\', '@', '#', '$', '%', '&', '*', '+', '='];
-  }
+  const generateAlphabet = () => {
+    if (isSymbolsMode) {
+      return ['.', ',', '?', '!', "'", '"', ':', ';', '-', '_', '(', ')', '/', '\\', '@', '#', '$', '%', '&', '*', '+', '='];
+    }
 
-  const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  return isUppercase ? base : base.map(l => l.toLowerCase());
-};
+    const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    return isUppercase ? base : base.map(l => l.toLowerCase());
+  };
 
 
   const alphabet = useMemo(() => generateAlphabet(), [isUppercase, isSymbolsMode]);
@@ -113,19 +118,19 @@ export default function AlphabetCircle() {
     //   setClearClicked(false)
     // }
 
-    if (submitClicked){
+    if (submitClicked) {
       setSubmitClicked(false)
     }
-    
+
     setTypedWord(prev => prev + letter);
     setRecentLetter(letter);
     logKeystroke('letter', letter);
-    
+
     if (shiftTemporary && !shiftLocked) {
       setIsUppercase(false);
       setShiftTemporary(false);
     }
-    
+
 
     const index = alphabet.indexOf(letter);
     const { x, y } = calculatePosition(index, alphabet.length);
@@ -146,23 +151,28 @@ export default function AlphabetCircle() {
 
   const handleClear = () => {
     setTypedWord('');
-    // logKeystroke('clear', 'X');
-    setKeystrokeLog([]);
     setStartTime(null);
+    setCurrentKeystrokes([]);
     logKeystroke('clear', 'X');
   };
 
+
   const handleSubmit = () => {
     setTypedWord(prev => prev + " ");
-    setSubmitClicked(true)
+    setSubmitClicked(true);
     logKeystroke('submit', 'X');
-    // console.log("submit")
-    console.log('Keystroke Log:', keystrokeLog);
-    // setClearClicked(true)
-    // setSession(prev => [...prev, "session ",{ time: now(), type, value }]);
-    console.log(session)
 
-  }
+    const newSession = {
+      sessionId: keystrokeLog.length + 1,
+      keystrokes: currentKeystrokes,
+    };
+
+    setKeystrokeLog(prev => [...prev, newSession]);
+    setCurrentKeystrokes([]); // reset for next session
+
+    console.log('New session added:', newSession);
+  };
+
 
   const [shiftTemporary, setShiftTemporary] = useState(false);
 
@@ -172,34 +182,34 @@ export default function AlphabetCircle() {
   const toggleCase = () => {
     const nowTap = Date.now();
     const timeSinceLastTap = nowTap - lastShiftTapTime.current;
-  
+
     if (shiftLocked) {
       setIsUppercase(false);
       setShiftLocked(false);
       setShiftTemporary(false);
     }
-  
-    
+
+
     else if (timeSinceLastTap < 400) {
       setIsUppercase(true);
       setShiftLocked(true);
       setShiftTemporary(false);
     }
-  
+
 
     else {
       setIsUppercase(true);
       setShiftTemporary(true);
       setShiftLocked(false);
     }
-  
+
     lastShiftTapTime.current = nowTap;
     logKeystroke('shift', 'shift');
   };
-  
-  
-  
-  
+
+
+
+
 
 
   const handleSpace = () => {
@@ -255,12 +265,12 @@ export default function AlphabetCircle() {
     Y: ['O', 'E', 'A'],
     Z: ['A', 'E', 'I'],
   };
-  
+
   const getSuggestions = (lastLetter) => {
     const baseSuggestions = staticSuggestions[lastLetter.toUpperCase()] || [];
     return isUppercase ? baseSuggestions : baseSuggestions.map(l => l.toLowerCase());
   };
-  
+
 
   return (
     <div className="flex flex-col items-center pt-3 p-8 rounded-lg">
@@ -286,7 +296,7 @@ export default function AlphabetCircle() {
           Save
         </button>
       </div>
-  
+
       <div className="mb-2 w-full max-w-md">
         <div className="flex items-center mb-2">
           <div className="flex-grow p-3 bg-white border border-gray-300 rounded-lg text-xl font-medium min-h-12">
@@ -294,7 +304,7 @@ export default function AlphabetCircle() {
           </div>
         </div>
       </div>
-  
+
       <div
         className="relative"
         style={{
@@ -311,33 +321,32 @@ export default function AlphabetCircle() {
             left: `${radius + letterRadius - (radius + 60) / 2}px`
           }}
         >
-         <button
+          <button
             onClick={toggleCase}
-            className={`rounded-tl-full px-4 py-10 ${
-              isUppercase
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 hover:bg-gray-300'
-            } rounded-lg w-36 h-36 text-sm font-medium`}
+            className={`rounded-tl-full px-4 py-10 ${isUppercase
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 hover:bg-gray-300'
+              } rounded-lg w-36 h-36 text-sm font-medium`}
           >
             {shiftLocked ? 'Caps Lock' : shiftTemporary ? 'Shift ' : 'Shift'}
-        </button>
+          </button>
 
 
-  
+
           <button
             onClick={handleBackspace}
             className="rounded-tr-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-36 h-36 text-sm font-medium"
           >
             Backspace
           </button>
-  
+
           <button
             onClick={handleClear}
             className="rounded-bl-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-36 h-36 text-sm font-medium"
           >
             Clear
           </button>
-  
+
           <button
             onClick={handleSpace}
             className="rounded-br-full px-4 py-10 bg-gray-200 hover:bg-gray-300 rounded-lg w-36 h-36 text-sm font-medium"
@@ -345,41 +354,40 @@ export default function AlphabetCircle() {
             Space
           </button>
           {/* Toggle Symbols Button - Center of the 4 control buttons */}
-          
-<button
-  onClick={() => {
-    setIsSymbolsMode(prev => !prev);
-    setRecentLetter(null);
-    setSuggestions([]);
-  }}
-  className="absolute bg-fuchsia-300 hover:bg-fuchsia-400 rounded-full px-3 py-1 text-sm font-medium w-20 h-20 shadow"
-  style={{
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    zIndex: 50,
-  }}
->
-  {isSymbolsMode ? 'ABC' : '123'}
-</button>
+
+          <button
+            onClick={() => {
+              setIsSymbolsMode(prev => !prev);
+              setRecentLetter(null);
+              setSuggestions([]);
+            }}
+            className="absolute bg-fuchsia-300 hover:bg-fuchsia-400 rounded-full px-3 py-1 text-sm font-medium w-20 h-20 shadow"
+            style={{
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 50,
+            }}
+          >
+            {isSymbolsMode ? 'ABC' : '123'}
+          </button>
 
 
 
 
 
         </div>
-  
+
         {/* Letter Bubbles */}
         {alphabet.map((letter, index) => {
           const { x, y } = calculatePosition(index, alphabet.length);
           return (
             <div
               key={letter}
-              className={`absolute flex items-center justify-center rounded-full cursor-pointer transition-all duration-200 ${
-                recentLetter === letter
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-white text-gray-800 hover:bg-blue-100'
-              }`}
+              className={`absolute flex items-center justify-center rounded-full cursor-pointer transition-all duration-200 ${recentLetter === letter
+                ? 'bg-blue-500 text-white'
+                : 'bg-white text-gray-800 hover:bg-blue-100'
+                }`}
               style={{
                 width: `${letterRadius * 2}px`,
                 height: `${letterRadius * 2}px`,
@@ -397,7 +405,7 @@ export default function AlphabetCircle() {
             </div>
           );
         })}
-  
+
         {/* Suggestion Bubbles */}
         {suggestions.map((sugg, i) => {
           const normalized =
@@ -409,10 +417,10 @@ export default function AlphabetCircle() {
           const angleOffset = (i - 1) * (Math.PI / 15);
           const angle = baseAngle + angleOffset;
           const dist = radius + 50;
-  
+
           const x = dist * Math.cos(angle);
           const y = dist * Math.sin(angle);
-  
+
           return (
             <div
               key={sugg}
@@ -435,5 +443,5 @@ export default function AlphabetCircle() {
       </div>
     </div>
   );
-  
+
 }

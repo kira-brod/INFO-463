@@ -1,22 +1,77 @@
 [
   {
-    "time": 1748750706923,
-    "type": "letter",
-    "value": "R"
+    "sessionId": 1,
+    "keystrokes": [
+      {
+        "time": 1748830682539,
+        "type": "letter",
+        "value": "C"
+      },
+      {
+        "time": 1748830682911,
+        "type": "letter",
+        "value": "D"
+      },
+      {
+        "time": 1748830683141,
+        "type": "letter",
+        "value": "E"
+      },
+      {
+        "time": 1748830683384,
+        "type": "letter",
+        "value": "E"
+      },
+      {
+        "time": 1748830691849,
+        "type": "letter",
+        "value": "B"
+      },
+      {
+        "time": 1748830692191,
+        "type": "letter",
+        "value": "C"
+      },
+      {
+        "time": 1748830692623,
+        "type": "letter",
+        "value": "E"
+      },
+      {
+        "time": 1748830692992,
+        "type": "letter",
+        "value": "F"
+      }
+    ]
   },
   {
-    "time": 1748750707251,
-    "type": "letter",
-    "value": "R"
-  },
-  {
-    "time": 1748750707667,
-    "type": "letter",
-    "value": "W"
-  },
-  {
-    "time": 1748750708410,
-    "type": "submit",
-    "value": "X"
+    "sessionId": 2,
+    "keystrokes": [
+      {
+        "time": 1748830700899,
+        "type": "clear",
+        "value": "X"
+      },
+      {
+        "time": 1748830701780,
+        "type": "letter",
+        "value": "K"
+      },
+      {
+        "time": 1748830702502,
+        "type": "letter",
+        "value": "I"
+      },
+      {
+        "time": 1748830702977,
+        "type": "letter",
+        "value": "G"
+      },
+      {
+        "time": 1748830703327,
+        "type": "letter",
+        "value": "E"
+      }
+    ]
   }
 ]
