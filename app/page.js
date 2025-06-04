@@ -179,6 +179,11 @@ export default function AlphabetCircle() {
     setCurrentKeystrokes([]); // reset for next session
 
     console.log('New session added:', newSession);
+
+    setTypedWord('');
+    setStartTime(null);
+    setCurrentKeystrokes([]);
+    
   };
 
 
