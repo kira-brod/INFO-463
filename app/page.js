@@ -69,6 +69,10 @@ export default function AlphabetCircle() {
 
     console.log(result);
     setStatus(result.message || 'Saved');
+
+    alert(
+      ` Saved!`
+    );
   };
 
 
@@ -166,6 +170,10 @@ export default function AlphabetCircle() {
       sessionId: keystrokeLog.length + 1,
       keystrokes: currentKeystrokes,
     };
+
+    alert(
+      `Submission complete!`
+    );
 
     setKeystrokeLog(prev => [...prev, newSession]);
     setCurrentKeystrokes([]); // reset for next session
