@@ -171,9 +171,9 @@ export default function AlphabetCircle() {
       keystrokes: currentKeystrokes,
     };
 
-    alert(
-      `Submission complete!`
-    );
+    // alert(
+    //   `Submission complete!`
+    // );
 
     setKeystrokeLog(prev => [...prev, newSession]);
     setCurrentKeystrokes([]); // reset for next session
